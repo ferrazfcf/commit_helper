@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3 python
+#!/usr/bin/env python
 
 import tkinter as tk
 from tkinter import ttk
@@ -19,19 +19,50 @@ def setup_window_position():
     y = (hs/2) - (h/2)
     window.geometry('+%d+%d' % (x, y))
 
-def generate_commit_command():
+def copy_to_clipboard_command():
+    command = generate_command()
     clipBoardEntry.config(state='normal')
     clipBoardEntry.delete(0, 'end')
-    clipBoardEntry.insert(0, "Test")
+    clipBoardEntry.insert(0, command)
     clipBoardEntry.config(state='readonly')
+    window.clipboard_clear()
+    window.clipboard_append(command)
     window.update
 
 def noEditChange():
     if noEdit.get() == 1:
+        commitPrefixEntry.delete(0, 'end')
+        commitPrefixEntry.config(state='disabled')
         commitMessageEntry.delete(0, 'end')
         commitMessageEntry.config(state='disabled')
     else:
+        commitPrefixEntry.config(state='normal')
         commitMessageEntry.config(state='normal')
+
+def generate_command():
+    command = "git commit "
+    command += add_modifiers_string()
+    command = message_string(command)
+    return command
+
+def add_modifiers_string():
+    command = ""
+    if addAll.get() == 1:
+        command += "-a "
+    if amend.get() == 1:
+        command += "--amend "
+    if noEdit.get() == 1:
+        command += "--no-edit "
+    return command
+
+def message_string(command):
+    message = command
+    if noEdit.get() == 0:
+        if commitPrefixEntry.get() == "" or commitMessageEntry.get() == "":
+            message = "Should fill Prefix and Message!"
+        else:
+            message += "-m \"[" + commitPrefixEntry.get().upper().replace('\n', '').replace('\r', '') + "] " + commitMessageEntry.get().replace('\n', '').replace('\r', '') + "\""
+    return message
 #end FUNCTIONS
 
 #region SETUP UI
@@ -49,7 +80,7 @@ commitMessageEntry = tk.Entry(window)
 commitPrefixEntry.grid(row=1, column=1, columnspan=3, sticky='ew')
 commitMessageEntry.grid(row=2, column=1, columnspan=3, sticky='ew')
 
-ttk.Button(window, text='Generate command and copy', style='TButton', command=generate_commit_command).grid(row=3, columnspan=4, sticky='ew')
+ttk.Button(window, text='Generate command and copy', style='TButton', command=copy_to_clipboard_command).grid(row=3, columnspan=4, sticky='ew')
 
 clipBoardEntry = tk.Entry(window, state='readonly')
 clipBoardEntry.grid(row=4, columnspan=4, sticky='ew')
