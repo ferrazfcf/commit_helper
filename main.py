@@ -41,11 +41,11 @@ def noEditChange():
 
 def generate_command():
     command = "git commit "
-    command += add_modifiers_string()
+    command += add_arguments_string()
     command = message_string(command)
     return command
 
-def add_modifiers_string():
+def add_arguments_string():
     command = ""
     if addAll.get() == 1:
         command += "-a "
@@ -66,7 +66,7 @@ def message_string(command):
 #end FUNCTIONS
 
 #region SETUP UI
-tk.Label(window, text='Modifiers', anchor='w').grid(row=0, column=0)
+tk.Label(window, text='Arguments', anchor='w').grid(row=0, column=0)
 tk.Label(window, text='Commit prefix', anchor='w').grid(row=1, column=0)
 tk.Label(window, text='Commit Message', anchor='w').grid(row=2, column=0)
 
